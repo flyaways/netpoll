@@ -8,7 +8,6 @@ package netpoll
 
 import (
 	"syscall"
-	"unsafe"
 )
 
 // Poll ...
@@ -31,9 +30,6 @@ func OpenPoll() *Poll {
 
 // Close ...
 func (p *Poll) Close() error {
-	if err := syscall.Close(p.wfd); err != nil {
-		return err
-	}
 	return syscall.Close(p.fd)
 }
 
@@ -54,8 +50,8 @@ func (p *Poll) Wait(iter func(int)) error {
 	}
 }
 
-// AddReadWrite ...
-func (p *Poll) AddReadWrite(fd int) {
+// AddWrite ...
+func (p *Poll) Add(fd int) {
 	if err := syscall.EpollCtl(p.fd, syscall.EPOLL_CTL_ADD, fd,
 		&syscall.EpollEvent{Fd: int32(fd),
 			Events: syscall.EPOLLIN | syscall.EPOLLOUT,
@@ -65,41 +61,8 @@ func (p *Poll) AddReadWrite(fd int) {
 	}
 }
 
-// AddRead ...
-func (p *Poll) AddRead(fd int) {
-	if err := syscall.EpollCtl(p.fd, syscall.EPOLL_CTL_ADD, fd,
-		&syscall.EpollEvent{Fd: int32(fd),
-			Events: syscall.EPOLLIN,
-		},
-	); err != nil {
-		panic(err)
-	}
-}
-
-// ModRead ...
-func (p *Poll) ModRead(fd int) {
-	if err := syscall.EpollCtl(p.fd, syscall.EPOLL_CTL_MOD, fd,
-		&syscall.EpollEvent{Fd: int32(fd),
-			Events: syscall.EPOLLIN,
-		},
-	); err != nil {
-		panic(err)
-	}
-}
-
-// ModReadWrite ...
-func (p *Poll) ModReadWrite(fd int) {
-	if err := syscall.EpollCtl(p.fd, syscall.EPOLL_CTL_MOD, fd,
-		&syscall.EpollEvent{Fd: int32(fd),
-			Events: syscall.EPOLLIN | syscall.EPOLLOUT,
-		},
-	); err != nil {
-		panic(err)
-	}
-}
-
-// ModDetach ...
-func (p *Poll) ModDetach(fd int) {
+// Del ...
+func (p *Poll) Del(fd int) {
 	if err := syscall.EpollCtl(p.fd, syscall.EPOLL_CTL_DEL, fd,
 		&syscall.EpollEvent{Fd: int32(fd),
 			Events: syscall.EPOLLIN | syscall.EPOLLOUT,

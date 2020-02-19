@@ -53,7 +53,7 @@ func main() {
 
 	//syscall.SetNonblock(fd, true)
 
-	p.AddRead(int(fd))
+	p.Add(int(fd))
 
 	log.Println(l.LocalAddr().String())
 
@@ -68,7 +68,8 @@ func main() {
 		log.Println(SockaddrToAddr(addr).String(), string(buf[:n]))
 		log.Println(SockaddrToAddr(addr).String(), syscall.Sendto(fd, buf[:n], 0, addr))
 
-		syscall.CloseOnExec(fd)
+		p.Del(fd)
+		//syscall.CloseOnExec(fd)
 	}))
 
 	log.Println("done")

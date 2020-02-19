@@ -52,8 +52,8 @@ func (p *Poll) Wait(iter func(int)) error {
 	}
 }
 
-// AddRead ...
-func (p *Poll) AddRead(fd int) {
+// Add ...
+func (p *Poll) Add(fd int) {
 	p.changes = append(p.changes,
 		syscall.Kevent_t{
 			Ident: uint64(fd), Flags: syscall.EV_ADD, Filter: syscall.EVFILT_READ,
@@ -61,34 +61,8 @@ func (p *Poll) AddRead(fd int) {
 	)
 }
 
-// AddReadWrite ...
-func (p *Poll) AddReadWrite(fd int) {
-	p.changes = append(p.changes,
-		syscall.Kevent_t{
-			Ident: uint64(fd), Flags: syscall.EV_ADD, Filter: syscall.EVFILT_READ,
-		},
-		syscall.Kevent_t{
-			Ident: uint64(fd), Flags: syscall.EV_ADD, Filter: syscall.EVFILT_WRITE,
-		},
-	)
-}
-
-// ModRead ...
-func (p *Poll) ModRead(fd int) {
-	p.changes = append(p.changes, syscall.Kevent_t{
-		Ident: uint64(fd), Flags: syscall.EV_DELETE, Filter: syscall.EVFILT_WRITE,
-	})
-}
-
-// ModReadWrite ...
-func (p *Poll) ModReadWrite(fd int) {
-	p.changes = append(p.changes, syscall.Kevent_t{
-		Ident: uint64(fd), Flags: syscall.EV_ADD, Filter: syscall.EVFILT_WRITE,
-	})
-}
-
-// ModDetach ...
-func (p *Poll) ModDetach(fd int) {
+// Del ...
+func (p *Poll) Del(fd int) {
 	p.changes = append(p.changes,
 		syscall.Kevent_t{
 			Ident: uint64(fd), Flags: syscall.EV_DELETE, Filter: syscall.EVFILT_READ,
